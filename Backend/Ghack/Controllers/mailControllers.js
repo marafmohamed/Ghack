@@ -31,16 +31,16 @@ const getAllMails = async (req, res) => {
   }
 };
 const getDepartementMails = async (req, res) => {
-  const { departement } = req.query.departement;
+  const departement = req.user.departement;
   try {
-    if (req.user.departement !== departement) {
-      res
-        .status(400)
-        .json({
-          error:
-            "only users from the departement can access the mails of the departement",
-        });
-    }
+    // if (req.user.departement !== departement) {
+    //   res
+    //     .status(400)
+    //     .json({
+    //       error:
+    //         "only users from the departement can access the mails of the departement",
+    //     });
+    // }
     if (req.user.role !== "respo") {
       res
         .status(400)
