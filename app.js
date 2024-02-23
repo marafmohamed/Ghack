@@ -1,8 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const {getAllDepartements} = require("./Controllers/departementControllers");
+const Mail = require("./models/mailModel");
 const Imap = require("imap");
 require("dotenv").config();
 const { simpleParser } = require("mailparser");
+const { default: axios } = require("axios");
 const app = express();
 const port = 3000;
 const password = process.env.MOT_DE_PASSE;
@@ -31,7 +34,7 @@ imap.once("error", function (err) {
 imap.connect();
 
 // Function to fetch and process new emails
-function fetchEmails() {
+ const fetchEmails = ()=> {
   imap.openBox("INBOX", false, (err, mailbox) => {
     if (err) throw err;
 
@@ -45,9 +48,25 @@ function fetchEmails() {
           msg.on("body", (stream) => {
             simpleParser(stream, (err, parsed) => {
               if (err) throw err;
-              console.log(
-                parsed
-              );
+              getAllDepartements().then((departements) => {
+                  const departementNames = departements.map((departement) => departement.name);
+                  axios.post("/mail_classification/text", {
+                    content: parsed.text,
+                    categories: departementNames,
+                  }).then((response) => {
+                    if (parsed.attachments.length > 0) {
+                      Mail.create({
+                        subject :parsed.subject,
+                        message: parsed.text,
+                        from :parsed.from.text,
+                        departement: response.data.category,
+                        attachement : parsed.attachments,
+                      });
+                    } else {
+                      Mail.create({ subject:parsed.subject, message:parsed.text, from:parsed.from.text, departement: response.data.category});
+                    }
+                  })
+              }) ;
             });
           });
         });
