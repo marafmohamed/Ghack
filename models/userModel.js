@@ -35,7 +35,7 @@ UserModel.statics.login = async function (Name, Email, company) {
   if (!validator.isEmail(Email)) {
     throw new Error("Email does't exist");
   }
-  const User = await this.findOne({ Email });
+  const User = await this.findOne({ Email ,Name });
   if (!User) {
     throw new Error("Email does't exist");
   }

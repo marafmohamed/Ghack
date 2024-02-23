@@ -1,7 +1,7 @@
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const CreateToken = (_id) => {
-  return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
+  return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "10d" });
 };
 const signupUser = async (req, res) => {
   const { Name, Email, company } = req.body;
@@ -16,12 +16,14 @@ const signupUser = async (req, res) => {
 const modifyUserRole = async (req, res) => {
   const { id, role } = req.body;
   try {
+    if(!role || !id){
+      res.status(400).json({error:"all field are required"});
+    }
     if (role == "admin" && req.user.role !== "admin") {
-      return res
-        .status(401)
-        .json({ error: "only admins can change users roles" });
+      return res.status(401).json({ error: "only admins can change users roles" });
     }
     const user = await User.findByIdAndUpdate(id, { role });
+    res.status(200).json(user);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
