@@ -3,19 +3,15 @@ const Schema = mongoose.Schema;
 const mailModel = new Schema({
     subject: {
         type: String,
-        required: true,
     },
     content: {
         type: String,
-        required: true,
     },
     sender: {
         type: String,
-        required: true,
     },
     departement: {
         type: String,
-        required: true,
     },
     priority: {
         type: String,
