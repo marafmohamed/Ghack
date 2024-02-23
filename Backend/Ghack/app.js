@@ -7,7 +7,7 @@ require("dotenv").config();
 const { simpleParser } = require("mailparser");
 const { default: axios } = require("axios");
 const app = express();
-const port = 3000;
+const port = 8000;
 const password = process.env.MOT_DE_PASSE;
 const imapConfig = {
   user: "ghackcourrier@gmail.com",
@@ -57,13 +57,13 @@ imap.connect();
                     if (parsed.attachments.length > 0) {
                       Mail.create({
                         subject :parsed.subject,
-                        message: parsed.text,
-                        from :parsed.from.text,
-                        departement: response.data.category,
+                        content: parsed.text,
+                        sender :parsed.from.text,
+                        departement: response.result,
                         attachement : parsed.attachments,
                       });
                     } else {
-                      Mail.create({ subject:parsed.subject, message:parsed.text, from:parsed.from.text, departement: response.data.category});
+                      Mail.create({ subject:parsed.subject, content:parsed.text, sender:parsed.from.text, departement: response.result});
                     }
                   })
               }) ;
@@ -86,7 +86,7 @@ setInterval(fetchEmails, 6000);
 
 // Start the Express server
 mongoose.connect(process.env.URI).then(() => {
-  app.listen(process.env.PORT, () => {
+  app.listen(port, () => {
     console.log(
       "connected to the db and listening at port : ",
     port
